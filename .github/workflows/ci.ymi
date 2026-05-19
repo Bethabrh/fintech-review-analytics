@@ -1,5 +1,7 @@
 name: FinTech Review Analytics CI
-
+- name: Validate scripts run without crash (smoke test)
+  run: |
+    python -c "import src.preprocess_reviews"
 on:
   push:
     branches:

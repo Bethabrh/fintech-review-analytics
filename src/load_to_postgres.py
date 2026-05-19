@@ -2,24 +2,26 @@ import pandas as pd
 import psycopg2
 
 # -----------------------------
-# DATABASE CONNECTION
+# CONNECT TO POSTGRESQL
 # -----------------------------
 conn = psycopg2.connect(
     host="localhost",
     database="bank_reviews",
     user="postgres",
-    password="YOUR_PASSWORD"
+   password="Fintech@2026_DB!"
 )
 
 cursor = conn.cursor()
 
 # -----------------------------
-# LOAD CSV
+# LOAD DATASET
 # -----------------------------
 df = pd.read_csv("data/raw/reviews_with_themes.csv")
 
+print("Dataset loaded successfully!")
+
 # -----------------------------
-# INSERT BANKS
+# INSERT UNIQUE BANKS
 # -----------------------------
 banks = df["bank"].unique()
 
@@ -28,20 +30,26 @@ for bank in banks:
         """
         INSERT INTO banks (bank_name)
         VALUES (%s)
-        ON CONFLICT DO NOTHING
+        ON CONFLICT (bank_name) DO NOTHING
         """,
         (bank,)
     )
 
 conn.commit()
 
+print("Banks inserted!")
+
 # -----------------------------
-# CREATE BANK ID MAP
+# FETCH BANK IDs
 # -----------------------------
 cursor.execute("SELECT bank_id, bank_name FROM banks")
+
 bank_rows = cursor.fetchall()
 
-bank_map = {name: bank_id for bank_id, name in bank_rows}
+bank_map = {}
+
+for row in bank_rows:
+    bank_map[row[1]] = row[0]
 
 # -----------------------------
 # INSERT REVIEWS
@@ -73,10 +81,11 @@ for _, row in df.iterrows():
             row["source"]
         )
     )
-
 conn.commit()
 
-print("Data inserted successfully!")
+print("Reviews inserted successfully!")
 
 cursor.close()
 conn.close()
+
+print("Database loading completed!")
