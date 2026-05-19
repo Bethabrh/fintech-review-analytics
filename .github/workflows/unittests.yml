@@ -1,0 +1,70 @@
+name: FinTech Review Analytics CI
+
+on:
+  push:
+    branches:
+      - main
+      - task-1
+      - task-2
+      - task-3
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.10]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ----------------------------
+      # 🔍 STRUCTURE VALIDATION
+      # ----------------------------
+      - name: Verify project structure
+        run: |
+          test -f src/scrape_reviews.py
+          test -f src/preprocess_reviews.py
+          test -f src/sentiment_analysis.py
+          test -f src/theme_extraction.py
+
+      # ----------------------------
+      # 🧠 SYNTAX CHECK (SAFE)
+      # ----------------------------
+      - name: Python syntax validation
+        run: |
+          python -m py_compile src/scrape_reviews.py
+          python -m py_compile src/preprocess_reviews.py
+          python -m py_compile src/sentiment_analysis.py
+          python -m py_compile src/theme_extraction.py
+
+      # ----------------------------
+      # 🧪 LIGHTWEIGHT SMOKE TEST
+      # ----------------------------
+      - name: Run preprocessing import test
+        run: |
+          python -c "import src.preprocess_reviews; print('Preprocess module OK')"
+
+      - name: Run sentiment import test
+        run: |
+          python -c "import src.sentiment_analysis; print('Sentiment module OK')"
+
+      - name: CI success message
+        run: echo "✅ All CI checks passed successfully!"
