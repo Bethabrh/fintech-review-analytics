@@ -1,14 +1,17 @@
- main
-# FinTech Review Analytics Pipeline
+📊 FinTech Review Analytics Pipeline
+📌 Project Overview
 
-## 📌 Project Overview
-This project implements an end-to-end data analytics pipeline for fintech mobile banking app reviews collected from the Google Play Store. The system performs scraping, preprocessing, sentiment analysis, and theme extraction to understand user feedback across Ethiopian banking applications.
+This project implements an end-to-end data analytics pipeline for fintech mobile banking app reviews collected from the Google Play Store. It transforms raw user feedback into structured insights using data engineering and NLP techniques.
 
-The goal is to extract actionable insights from customer reviews of mobile banking apps such as Commercial Bank of Ethiopia (CBE), Bank of Abyssinia (BOA), and Dashen Bank.
+The goal is to analyze customer sentiment and extract recurring themes from Ethiopian banking apps:
 
+Commercial Bank of Ethiopia (CBE)
+Bank of Abyssinia (BOA)
+Dashen Bank
 
-## 🏗️ Project Structure
+The final output helps identify user satisfaction drivers, pain points, and product improvement opportunities.
 
+🏗️ Project Structure
 fintech-review-analytics/
 │
 ├── data/
@@ -24,162 +27,106 @@ fintech-review-analytics/
 │   ├── sentiment_analysis.py
 │   └── theme_extraction.py
 │
-├── scripts/
-│
 ├── .github/
 │   └── workflows/
-│       └── ci.yml
+│       └── unittests.yml
 │
 ├── requirements.txt
 └── README.md
-
-
-
-
-## ⚙️ Pipeline Workflow
+⚙️ Pipeline Workflow
 
 The project follows a structured pipeline:
 
-**Data Collection → Data Cleaning → Sentiment Analysis → Theme Extraction**
+Data Collection → Data Cleaning → Sentiment Analysis → Theme Extraction
 
+📥 Task 1: Data Scraping
 
-## 📥 Task 1: Data Scraping
+File: src/scrape_reviews.py
 
-**File:** `src/scrape_reviews.py`
+Functionality:
+Scrapes Google Play Store reviews using google-play-scraper
+Targets Ethiopian banking apps:
+CBE
+BOA
+Dashen Bank
+Extracts:
+Review text
+Rating (1–5)
+Date
+Bank name
+Source (Google Play)
+Output:
+data/raw/raw_reviews.csv
+🧹 Task 2.1: Data Preprocessing
 
-- Scrapes Google Play Store reviews using `google-play-scraper`
-- Targets Ethiopian banking apps:
-  - Commercial Bank of Ethiopia (CBE)
-  - Bank of Abyssinia (BOA)
-  - Dashen Bank
-- Extracted fields:
-  - Review text
-  - Rating
-  - Date
-  - Bank name
+File: src/preprocess_reviews.py
 
-Output: `data/raw/raw_reviews.csv`
+Steps:
+Remove duplicate reviews
+Handle missing values
+Standardize date format (YYYY-MM-DD)
+Clean text (remove extra spaces and noise)
+Output:
+data/raw/clean_reviews.csv
+💬 Task 2.2: Sentiment Analysis
 
+File: src/sentiment_analysis.py
 
+Model Used:
+distilbert-base-uncased-finetuned-sst-2-english
+Functionality:
+Classifies reviews as:
+Positive
+Negative
+Generates confidence score for each prediction
+Output:
+data/raw/reviews_with_sentiment.csv
+🧠 Task 2.3: Theme Extraction
 
-## 🧹 Task 2.1: Data Preprocessing
+File: src/theme_extraction.py
 
-**File:** `src/preprocess_reviews.py`
-
-- Removes duplicate records
-- Handles missing values
-- Standardizes date format
-- Cleans review text (removes extra spaces and noise)
-
-Output: `data/raw/clean_reviews.csv`
-
-
-
-## 💬 Task 2.2: Sentiment Analysis
-
-**File:** `src/sentiment_analysis.py`
-
-- Uses HuggingFace Transformer model:
-  - `distilbert-base-uncased-finetuned-sst-2-english`
-- Classifies reviews into:
-  - Positive
-  - Negative
-- Produces confidence scores for predictions
-
-Output: `data/raw/reviews_with_sentiment.csv`
-
-
-
-## 🧠 Task 2.3: Theme Extraction
-
-**File:** `src/theme_extraction.py`
-
-- Applies TF-IDF vectorization to extract keywords
-- Uses rule-based logic to categorize themes:
-  - Transaction Performance
-  - App Stability
-  - User Interface
-  - Account Access Issues
-  - Feature Requests
-  - General Feedback
-
-Output: `data/raw/reviews_with_themes.csv`
-
-
-
-## 📊 Key Insights
-
-- Most reviews fall under general feedback
-- Common issues:
-  - Transaction delays
-  - Login and authentication problems
-  - App crashes and instability
-- Positive feedback includes:
-  - Ease of use
-  - Mobile banking convenience
-
-
-
-## 🚀 How to Run
-
-```bash
+Method:
+TF-IDF vectorization (keyword extraction)
+Rule-based classification
+Themes Identified:
+Transaction Performance
+App Stability
+User Interface
+Account Access Issues
+Feature Requests
+General Feedback
+Output:
+data/raw/reviews_with_themes.csv
+📊 Key Insights
+Majority of reviews fall under General Feedback
+Major issues identified:
+Transaction delays
+Login/authentication failures
+App crashes and instability
+Positive feedback highlights:
+Ease of use
+Mobile banking convenience
+🚀 How to Run the Project
 pip install -r requirements.txt
 
 python src/scrape_reviews.py
 python src/preprocess_reviews.py
 python src/sentiment_analysis.py
 python src/theme_extraction.py
+⚠️ Limitations
+Sentiment model is not trained on Ethiopian banking-specific data
+Theme classification is rule-based (not a trained ML model)
+Dataset is limited to Google Play Store reviews only
+📌 Technologies Used
+Python
+pandas
+scikit-learn
+HuggingFace Transformers
+google-play-scraper
+👨‍💻 Author
 
-
-
-
-## ⚠️ Limitations
-
-- Sentiment model is not trained on Ethiopian banking-specific data
-- Theme classification is rule-based, not a trained ML classifier
-- Dataset is limited to Google Play Store reviews only
-
-
-
-## 📌 Technologies Used
-
-- Python
-- pandas
-- scikit-learn
-- HuggingFace Transformers
-- google-play-scraper
-
-
-
-## 👨‍💻 Author
 FinTech Review Analytics Project
 
-# 🧠 Pipeline Overview
+🧠 Summary
 
-This project is divided into two main phases:
-
-## Task 1: Data Collection & Preprocessing
-- scrape_reviews.py → Scrapes Google Play reviews for CBE, BOA, Dashen
-- preprocess_reviews.py → Cleans dataset (duplicates, missing values, date formatting)
-- Output: data/raw/raw_reviews.csv (1200 reviews)
-
-## Task 2: NLP Analysis
-- sentiment_analysis.py → Applies DistilBERT sentiment classification
-- theme_extraction.py → Extracts keywords and clusters into themes using TF-IDF
-
-## Dataset Summary
-- Total reviews: 1200+
-- Banks: CBE, BOA, Dashen
-- Source: Google Play Store
-# ▶️ How to Run Project
-
-## Task 1: Scraping + Preprocessing
-python src/scrape_reviews.py
-python src/preprocess_reviews.py
-
-## Task 2: Sentiment Analysis
-python src/sentiment_analysis.py
-
-## Task 2: Theme Extraction
-python src/theme_extraction.py
- task-1
+This project demonstrates a complete data engineering + NLP pipeline that transforms raw fintech app reviews into structured insights for product decision-making.
